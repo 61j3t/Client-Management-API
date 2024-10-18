@@ -2,6 +2,7 @@
 
 const express = require('express');
 const path = require('path')
+const Throttle = require('throttle');
 const fs = require('fs')
 const { Pool } = require('pg');
 require('dotenv').config();
@@ -76,13 +77,17 @@ app.get('/bandwidth-usage/:client_id', async (req, res) => {
     }
 });
 
-// Bandwidth limit in bytes per second (example: 0.5 MB/s)
-const BANDWIDTH_LIMIT = 0.5 * 1024 * 1024; // 0.5 MB/s in bytes
+// Object to store bandwidth usage for each client
+const clientBandwidthUsage = {};
+
+// Set a bandwidth limit to 1.5 MB per second
+const BANDWIDTH_LIMIT = 100000 * 1024 * 1024; // 1.5 MB in bytes
 
 app.get('/download', (req, res) => {
-    console.log('Download requested')
-    const filePath = path.join(__dirname, 'lib.dylib.zip'); // Update if needed
-    
+    const clientId = req.query.client_id || 'unknown'; // Get client ID from query parameter
+    console.log(`Download requested by client: ${clientId}`);
+    const filePath = path.join(__dirname, 'file.zip'); // Update path if needed
+
     if (!fs.existsSync(filePath)) {
         return res.status(404).send('File not found');
     }
@@ -94,17 +99,31 @@ app.get('/download', (req, res) => {
     });
 
     const readStream = fs.createReadStream(filePath);
-    
-    readStream.on('data', (chunk) => {
-        const chunkSize = chunk.length;
-        const delay = (chunkSize * 8) / BANDWIDTH_LIMIT * 1000; // Convert to milliseconds
-        setTimeout(() => {
-            res.write(chunk);
-        }, delay);
+    const throttle = new Throttle(BANDWIDTH_LIMIT); // Create a throttle stream
+
+    // Create a variable to track the total bytes sent
+    let totalBytesSent = 0;
+    const startTime = Date.now();
+
+    // Initialize bandwidth usage for the client
+    clientBandwidthUsage[clientId] = { totalBytesSent: 0, startTime };
+
+    // Pipe the read stream through the throttle to the response
+    readStream.pipe(throttle).pipe(res);
+
+    throttle.on('data', (chunk) => {
+        totalBytesSent += chunk.length; // Update the total bytes sent
+        clientBandwidthUsage[clientId].totalBytesSent += chunk.length; // Update client's total bytes sent
+
+        const elapsedTime = (Date.now() - clientBandwidthUsage[clientId].startTime) / 1000; // Time in seconds
+        const kbps = (clientBandwidthUsage[clientId].totalBytesSent * 8) / 1024 / elapsedTime; // Convert to kbps
+
+        // Log the kbps for the specific client
+        console.log(`${clientId} bw: ${kbps.toFixed(2)} kbps`);
     });
 
     readStream.on('end', () => {
-        res.end();
+        console.log(`Download complete for client: ${clientId}`);
     });
 
     readStream.on('error', (err) => {
@@ -117,3 +136,4 @@ app.get('/download', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
