@@ -1,7 +1,7 @@
 const { logBandwidthUsage } = require('./bandwidthService');
 const { getAllClients } = require('./clientService');
 
-const TOTAL_BANDWIDTH_LIMIT = 10; // Define the total bandwidth limit in kbps
+const TOTAL_BANDWIDTH_LIMIT = 4000; // Define the total bandwidth limit in kbps
 
 const simulateTraffic = async () => {
     const clients = await getAllClients();
