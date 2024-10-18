@@ -38,6 +38,7 @@ const { isAuthenticated } = require('../middleware/authMiddleware');
  */
 router.post('/pause', isAuthenticated, async (req, res) => {
     const { client_id } = req.body;
+    console.log(req.body)
     try {
         await pauseClient(client_id);
         res.status(200).send('Client connection paused successfully');
@@ -158,4 +159,3 @@ router.post('/adjust-bandwidth', isAuthenticated, async (req, res) => {
 });
 
 module.exports = router;
-

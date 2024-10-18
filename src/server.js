@@ -3,8 +3,9 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const adminRoutes = require('./routes/adminRoutes');
 const downloadRoutes = require('./routes/downloadRoutes');
+const bandwidthRoutes = require('./routes/bandwidthRoutes');
 const clientRoutes = require('./routes/clientRoutes');
-const controlRoutes = require('./routes/controlRoutes'); // Import control routes
+const controlRoutes = require('./routes/controlRoutes');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const { simulateTraffic } = require('./services/trafficSimulationService'); // Import the traffic simulation service
@@ -49,7 +50,8 @@ app.use(session({
 app.use(adminRoutes);
 app.use(downloadRoutes);
 app.use(clientRoutes);
-app.use(controlRoutes); // Use control routes
+app.use('/control', controlRoutes);
+app.use(bandwidthRoutes);
 
 // Start traffic simulation
 simulateTraffic();

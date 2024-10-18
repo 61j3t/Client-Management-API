@@ -1,12 +1,13 @@
 const pool = require('../db/db');
 
-const logBandwidthUsage = async (client_id, kbps, timestamp, sessionId, status) => {
+const logBandwidthUsage = async (client_id, kbps, allocatedKbps, timestamp) => {
+
     try {
         await pool.query(
-            'INSERT INTO bandwidth_stats (client_id, requested_bandwidth, timestamp, session_id, status) VALUES ($1, $2, $3, $4, $5)',
-            [client_id, kbps, timestamp, sessionId, status]
+            'INSERT INTO bandwidth_stats (client_id, requested_bandwidth, allocated_bandwidth, timestamp) VALUES ($1, $2, $3, $4)',
+            [client_id, kbps, allocatedKbps, timestamp]
         );
-        console.log(`${timestamp} clientID: ${client_id}: ${kbps} kbps, Session: ${sessionId}, Status: ${status}`);
+        console.log(`${timestamp} clientID: ${client_id}: Requested: ${kbps} kbps, Allocated: ${allocatedKbps} kbps`);
     } catch (err) {
         console.error('Error logging bandwidth usage', err);
     }

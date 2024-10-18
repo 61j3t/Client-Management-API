@@ -90,7 +90,7 @@ const { isAuthenticated } = require('../middleware/authMiddleware');
  *       500:
  *         description: Error fetching bandwidth records
  */
-router.get('/', isAuthenticated, async (req, res) => {
+router.get('/bandwidth', isAuthenticated, async (req, res) => {
     const { client_id, start_date, end_date, status, limit = 100, offset = 0 } = req.query;
 
     try {
@@ -109,4 +109,3 @@ router.get('/', isAuthenticated, async (req, res) => {
 });
 
 module.exports = router;
-
