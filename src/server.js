@@ -1,23 +1,11 @@
-// src/server.js
-
 const express = require('express');
-const { connectDB } = require('./db/db'); // Import the database connection
-const routes = require('./routes/routes'); // Import routes
-require('dotenv').config();
+const { downloadFileHandler } = require('./controllers/bandwidthController');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-// Connect to the database
-connectDB();
+app.get('/download', downloadFileHandler);
 
-// Middleware to parse JSON requests
-app.use(express.json());
-
-// Use routes
-app.use(routes);
-
-// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -1,5 +1,5 @@
 const express = require('express');
-const { createClientHandler, checkAllTablesHandler, logBandwidthUsageHandler, getBandwidthUsageHandler, downloadFileHandler } = require('../controllers/bandwidth');
+const { createClientHandler, checkAllTablesHandler, logBandwidthUsageHandler, getBandwidthUsageHandler, downloadFileHandler } = require('../controllers/bandwidthController');
 
 const router = express.Router();
 

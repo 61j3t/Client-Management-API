@@ -7,5 +7,5 @@ NUM_CLIENTS=2
 for ((i=1; i<=NUM_CLIENTS; i++))
 do
     # Open a new terminal window and run the curl command with a unique client_id
-    osascript -e "tell application \"Terminal\" to do script \"curl -O http://localhost:3000/download?client_id=client$i\""
+    osascript -e "tell application \"Terminal\" to do script \"curl -O http://localhost:3000/download?client_id=$i\""
 done
