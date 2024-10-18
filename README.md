@@ -60,25 +60,13 @@ To set up the database locally, follow these steps:
    CREATE DATABASE your_database;
    ```
 
-2. **Run the Schema Script**: Execute the SQL schema file to create the necessary tables. You can do this using `psql` or `pgcli`:
+2. **Run the Setup Script**: Execute the import script to create the necessary tables and insert initial data:
 
    ```bash
-   psql -h your_host -U your_user -d your_database -f src/db/schema.sql
+   ./import_db.sh
    ```
 
-   Alternatively, if you are using `pgcli`, you can run:
-
-   ```sql
-   \i src/db/schema.sql
-   ```
-
-3. **Import Sample Data (Optional)**: If you have a sample data file, you can import it using the following command:
-
-   ```bash
-   psql -h your_host -U your_user -d your_database -c "\copy clients FROM 'path_to_your_sample_data.csv' WITH CSV HEADER;"
-   ```
-
-4. **Run the Application**: After setting up the database, you can start the application.
+3. **Update your `.env` file** with the correct database credentials.
 
 ## API Documentation
 
