@@ -6,7 +6,7 @@ const downloadRoutes = require('./routes/downloadRoutes');
 const clientRoutes = require('./routes/clientRoutes');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const { simulateTraffic } = require('./services/trafficSimulationService'); // Import the traffic simulation service
+const { simulateTraffic } = require('./services/trafficSimulationService');
 
 const app = express();
 const PORT = 3001;
