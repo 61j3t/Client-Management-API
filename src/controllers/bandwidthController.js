@@ -2,15 +2,23 @@ const { logBandwidthUsage } = require('../services/bandwidthService');
 const Throttle = require('throttle');
 const fs = require('fs');
 const path = require('path');
+const { getClientMaxBandwidth } = require('../services/clientService'); // Assume this service is implemented
 
-const BANDWIDTH_LIMIT = 1.5 * 1024 * 1024; // 1.5 MB in bytes
-
-const downloadFileHandler = (req, res) => {
+const downloadFileHandler = async (req, res) => {
     const clientId = req.query.client_id || 'unknown';
     const filePath = path.join(__dirname, '../../file.zip');
 
     if (!fs.existsSync(filePath)) {
         return res.status(404).send('File not found');
+    }
+
+    // Fetch the max bandwidth for the client from the database
+    let clientBandwidthLimit;
+    try {
+        clientBandwidthLimit = await getClientMaxBandwidth(clientId);
+    } catch (err) {
+        console.error('Error fetching client bandwidth limit:', err);
+        return res.status(500).send('Internal Server Error');
     }
 
     const stat = fs.statSync(filePath);
@@ -20,14 +28,15 @@ const downloadFileHandler = (req, res) => {
     });
 
     const readStream = fs.createReadStream(filePath);
-    const throttle = new Throttle(BANDWIDTH_LIMIT);
+    const throttle = new Throttle(clientBandwidthLimit || BANDWIDTH_LIMIT);
 
     let totalBytesSent = 0;
     const startTime = Date.now();
 
     const logInterval = setInterval(async () => {
         const elapsedTime = (Date.now() - startTime) / 1000;
-        const kbps = elapsedTime > 0 ? (totalBytesSent * 8) / 1024 / elapsedTime : 0;
+        let kbps = elapsedTime > 0 ? (totalBytesSent * 8) / 1024 / elapsedTime : 0;
+        kbps = Math.round(kbps * 100) / 100; // Round to two decimal places
         const timestamp = new Date().toISOString();
 
         try {
