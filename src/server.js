@@ -9,7 +9,7 @@ const swaggerUi = require('swagger-ui-express');
 const { simulateTraffic } = require('./services/trafficSimulationService'); // Import the traffic simulation service
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
 // Swagger definition
 const swaggerOptions = {
@@ -37,10 +37,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Session setup
 app.use(session({
-    secret: 'your-secret-key', // Replace with a strong secret key
+    secret: 'Xh8zA1q2k6T5sL9uJf3vPz8yRg7Dq4hR', 
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { secure: true } // Set to true if using HTTPS
 }));
 
 // Use routes
