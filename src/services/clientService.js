@@ -23,4 +23,18 @@ async function getClientMaxBandwidth(clientId) {
     }
 }
 
-module.exports = { getClientMaxBandwidth };
+/**
+ * Fetches all clients and their information from the database.
+ * @returns {Promise<Array>} - An array of client objects.
+ */
+async function getAllClients() {
+    try {
+        const result = await db.query('SELECT * FROM clients');
+        return result.rows;
+    } catch (err) {
+        console.error('Error fetching clients:', err);
+        throw err;
+    }
+}
+
+module.exports = { getClientMaxBandwidth, getAllClients };
