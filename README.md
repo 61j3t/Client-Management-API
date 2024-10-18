@@ -57,7 +57,7 @@ To set up the database locally, follow these steps:
 1. **Create the Database**: Open your PostgreSQL command line or pgcli and create a new database:
 
    ```sql
-   CREATE DATABASE your_database;
+   CREATE DATABASE devfest;
    ```
 
 2. **Run the Setup Script**: Execute the import script to create the necessary tables and insert initial data:
