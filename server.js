@@ -49,11 +49,13 @@ app.post('/clients', async (req, res) => {
 
 // API route to log bandwidth usage
 app.post('/bandwidth-usage', async (req, res) => {
-    const { client_id, requested_bandwidth, allocated_bandwidth } = req.body;
+    const { client_id, requested_bandwidth } = req.body; // Get requested bandwidth from the request
+    const allocated_bandwidth = BANDWIDTH_LIMIT; // Use the defined limit as allocated bandwidth
+
     try {
         const result = await pool.query(
             'INSERT INTO bandwidth_stats (client_id, requested_bandwidth, allocated_bandwidth) VALUES ($1, $2, $3) RETURNING *',
-            [client_id, requested_bandwidth, allocated_bandwidth]
+            [client_id, requested_bandwidth, allocated_bandwidth] // Log both requested and allocated bandwidth
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -81,7 +83,7 @@ app.get('/bandwidth-usage/:client_id', async (req, res) => {
 const clientBandwidthUsage = {};
 
 // Set a bandwidth limit to 1.5 MB per second
-const BANDWIDTH_LIMIT = 100000 * 1024 * 1024; // 1.5 MB in bytes
+const BANDWIDTH_LIMIT = 1.5 * 1024 * 1024; // 1.5 MB in bytes
 
 app.get('/download', (req, res) => {
     const clientId = req.query.client_id || 'unknown'; // Get client ID from query parameter
@@ -106,7 +108,34 @@ app.get('/download', (req, res) => {
     const startTime = Date.now();
 
     // Initialize bandwidth usage for the client
-    clientBandwidthUsage[clientId] = { totalBytesSent: 0, startTime };
+    clientBandwidthUsage[clientId] = { totalBytesSent: 0, startTime, kbps: 0 };
+
+    // Set an interval to log bandwidth usage every second
+    const logInterval = setInterval(async () => {
+        const elapsedTime = (Date.now() - clientBandwidthUsage[clientId].startTime) / 1000; // Time in seconds
+
+        // Ensure elapsedTime is greater than zero to avoid NaN
+        const kbps = elapsedTime > 0 
+            ? (clientBandwidthUsage[clientId].totalBytesSent * 8) / 1024 / elapsedTime // Convert to kbps
+            : 0; // Default to 0 if elapsedTime is not valid
+
+        // Get the current timestamp for logging
+        const timestamp = new Date().toISOString(); // Get the current timestamp in ISO format
+
+        // Log the kbps for the specific client with timestamp
+        console.log(`[${timestamp}] ${clientId} bw: ${kbps.toFixed(2)} kbps`);
+
+        // Log bandwidth usage to the database
+        const clientIdInt = parseInt(clientId, 10); // Ensure clientId is an integer
+        // try {
+        //     await pool.query(
+        //         'INSERT INTO bandwidth_stats (client_id, requested_bandwidth, allocated_bandwidth, timestamp) VALUES ($1, $2, $3, $4)',
+        //         [clientIdInt, kbps, BANDWIDTH_LIMIT, timestamp] // Include timestamp in the query
+        //     );
+        // } catch (err) {
+        //     console.error('Error logging bandwidth usage to database', err);
+        // }
+    }, 1000); // Log every second
 
     // Pipe the read stream through the throttle to the response
     readStream.pipe(throttle).pipe(res);
@@ -114,26 +143,35 @@ app.get('/download', (req, res) => {
     throttle.on('data', (chunk) => {
         totalBytesSent += chunk.length; // Update the total bytes sent
         clientBandwidthUsage[clientId].totalBytesSent += chunk.length; // Update client's total bytes sent
-
-        const elapsedTime = (Date.now() - clientBandwidthUsage[clientId].startTime) / 1000; // Time in seconds
-        const kbps = (clientBandwidthUsage[clientId].totalBytesSent * 8) / 1024 / elapsedTime; // Convert to kbps
-
-        // Log the kbps for the specific client
-        console.log(`${clientId} bw: ${kbps.toFixed(2)} kbps`);
     });
 
     readStream.on('end', () => {
         console.log(`Download complete for client: ${clientId}`);
+        clearInterval(logInterval); // Clear the interval when the download is complete
     });
 
     readStream.on('error', (err) => {
         console.error('Stream error:', err);
         res.status(500).send('Internal Server Error');
+        clearInterval(logInterval); // Clear the interval on error
     });
 });
+
+async function logBandwidthUsage(bandwidth) {
+    // Check if bandwidth is a valid number
+    if (isNaN(bandwidth) || bandwidth === null) {
+        console.error("Invalid bandwidth value:", bandwidth);
+        return; // Exit the function if the value is invalid
+    }
+
+    // Convert bandwidth to an integer
+    const bandwidthInt = parseInt(bandwidth, 10);
+
+    // Print the bandwidth usage instead of logging to the database
+    console.log("Bandwidth usage:", bandwidthInt);
+}
 
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-

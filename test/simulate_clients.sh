@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Number of clients to simulate
-NUM_CLIENTS=5
+NUM_CLIENTS=4
 
 # Loop to open multiple terminal windows
 for ((i=1; i<=NUM_CLIENTS; i++))
