@@ -6,6 +6,7 @@ const downloadRoutes = require('./routes/downloadRoutes');
 const clientRoutes = require('./routes/clientRoutes');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const { simulateTraffic } = require('./services/trafficSimulationService'); // Import the traffic simulation service
 
 const app = express();
 const PORT = 3000;
@@ -46,6 +47,9 @@ app.use(session({
 app.use(adminRoutes);
 app.use(downloadRoutes);
 app.use(clientRoutes);
+
+// Start traffic simulation
+simulateTraffic();
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
