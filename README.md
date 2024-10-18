@@ -1,80 +1,101 @@
-# DevFest Backend
+# Client Management API
 
-This project sets up an Express server that serves a file for download while logging bandwidth usage for multiple clients. It includes a script to simulate multiple clients downloading the file concurrently.
+## Overview
 
-## Prerequisites
+This project is a Client Management API built with Node.js and PostgreSQL. It provides endpoints for managing clients, logging bandwidth usage, and handling admin authentication.
 
-- Node.js (version 12 or higher)
-- npm (Node Package Manager)
-- PostgreSQL (for database operations)
+## Table of Contents
 
-## Setup Instructions
+- [Client Management API](#client-management-api)
+  - [Overview](#overview)
+  - [Table of Contents](#table-of-contents)
+  - [Technologies Used](#technologies-used)
+  - [Installation](#installation)
+  - [Database Setup](#database-setup)
+  - [API Documentation](#api-documentation)
+  - [Running the Application](#running-the-application)
+  - [Contributing](#contributing)
+  - [License](#license)
 
-1. **Clone the Repository** (if applicable):
+## Technologies Used
+
+- Node.js
+- Express
+- PostgreSQL
+- Swagger for API documentation
+- pgcli for database management
+
+## Installation
+
+1. Clone the repository:
 
    ```bash
-   git clone https://github.com/arhvnn/DevFest-Backend.git
-   cd DevFest-Backend
+   git clone https://github.com/yourusername/client-management-api.git
+   cd client-management-api
    ```
-2. **Install Dependencies**:
-   Navigate to the project directory and run:
+
+2. Install the required dependencies:
 
    ```bash
    npm install
    ```
-3. **Set Up Environment Variables**:
-   Create a `src/.env` file in the root of your project and add the following variables:
 
-   ```plaintext
-   PORT=3000
-   DB_HOST=your_database_host
-   DB_USER=your_database_user
-   DB_PASSWORD=your_database_password
-   DB_NAME=your_database_name
-   DB_PORT=your_database_port
+3. Create a `.env` file in the root directory and add your PostgreSQL database credentials:
+
    ```
-4. **Start the PostgreSQL Database**:
-   Ensure your PostgreSQL database is running and accessible.
-5. **Run the Server**:
-   You can use Nodemon for automatic restarts on file changes:
+   DB_HOST=your_host
+   DB_USER=your_user
+   DB_PASSWORD=your_password
+   DB_DATABASE=your_database
+   DB_PORT=your_port
+   ```
+
+## Database Setup
+
+To set up the database locally, follow these steps:
+
+1. **Create the Database**: Open your PostgreSQL command line or pgcli and create a new database:
+
+   ```sql
+   CREATE DATABASE your_database;
+   ```
+
+2. **Run the Schema Script**: Execute the SQL schema file to create the necessary tables. You can do this using `psql` or `pgcli`:
 
    ```bash
-   npx nodemon server.js
+   psql -h your_host -U your_user -d your_database -f src/db/schema.sql
    ```
 
-   Alternatively, you can run:
+   Alternatively, if you are using `pgcli`, you can run:
+
+   ```sql
+   \i src/db/schema.sql
+   ```
+
+3. **Import Sample Data (Optional)**: If you have a sample data file, you can import it using the following command:
 
    ```bash
-   node server.js
-   ```
-6. **Simulate Clients**:
-   To simulate multiple clients downloading the file, you can use the provided shell script. First, ensure the script is executable:
-
-   ```bash
-   chmod +x test/simulate_clients.sh
+   psql -h your_host -U your_user -d your_database -c "\copy clients FROM 'path_to_your_sample_data.csv' WITH CSV HEADER;"
    ```
 
-   Then, run the script:
+4. **Run the Application**: After setting up the database, you can start the application.
 
-   ```bash
-   ./test/simulate_clients.sh
-   ```
+## API Documentation
 
-## Observing Bandwidth Usage
+The API documentation is available at `http://localhost:3000/api-docs`. It provides detailed information about the available endpoints and their usage.
 
-As clients download the file, you will see logs in the terminal where the server is running, showing the bandwidth usage for each client in kilobits per second (kbps).
+## Running the Application
 
-## Notes
+To start the application, run:
+```bash
+npm start
+```
+The server will be running on `http://localhost:3000`.
 
-- Ensure that the file you want to download (e.g., `file.zip`) is present in the same directory as `server.js`.
-- Adjust the `BANDWIDTH_LIMIT` in `server.js` if you want to change the download speed cap.
-- You can modify the `NUM_CLIENTS` variable in `simulate_clients.sh` to simulate more or fewer clients.
+## Contributing
 
-## Troubleshooting
-
-- If you encounter issues with database connections, double-check your `.env` file for correct credentials.
-- Ensure that the server is running before executing the client simulation script.
+Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
