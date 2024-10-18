@@ -9,10 +9,9 @@ CREATE TABLE clients (
 
 -- Bandwidth Stats Table
 CREATE TABLE bandwidth_stats (
-    id SERIAL PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY ,
     client_id INT REFERENCES clients(id),
     requested_bandwidth DECIMAL(10, 2),
-    allocated_bandwidth DECIMAL(10, 2),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

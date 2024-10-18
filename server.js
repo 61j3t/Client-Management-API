@@ -127,14 +127,14 @@ app.get('/download', (req, res) => {
 
         // Log bandwidth usage to the database
         const clientIdInt = parseInt(clientId, 10); // Ensure clientId is an integer
-        // try {
-        //     await pool.query(
-        //         'INSERT INTO bandwidth_stats (client_id, requested_bandwidth, allocated_bandwidth, timestamp) VALUES ($1, $2, $3, $4)',
-        //         [clientIdInt, kbps, BANDWIDTH_LIMIT, timestamp] // Include timestamp in the query
-        //     );
-        // } catch (err) {
-        //     console.error('Error logging bandwidth usage to database', err);
-        // }
+        try {
+            await pool.query(
+                'INSERT INTO bandwidth_stats (client_id, requested_bandwidth, allocated_bandwidth, timestamp) VALUES ($1, $2, $3, $4)',
+                [clientIdInt, kbps, BANDWIDTH_LIMIT, timestamp] // Include timestamp in the query
+            );
+        } catch (err) {
+            console.error('Error logging bandwidth usage to database', err);
+        }
     }, 1000); // Log every second
 
     // Pipe the read stream through the throttle to the response
