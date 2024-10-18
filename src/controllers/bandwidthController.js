@@ -37,12 +37,11 @@ const downloadFileHandler = async (req, res) => {
         let kbps = elapsedTime > 0 ? (totalBytesSent * 8) / 1024 / elapsedTime : 0;
         kbps = Math.round(kbps * 100) / 100; // Round to two decimal places
         const timestamp = new Date().toISOString();
-        const ipAddress = req.ip; // Get the client's IP address from the request
         const sessionId = req.sessionID; // Get the session ID
         const status = 'active'; // You can set this based on your logic
 
         try {
-            await logBandwidthUsage(clientId, kbps, timestamp, ipAddress, sessionId, status);
+            await logBandwidthUsage(clientId, kbps, timestamp, sessionId, status);
         } catch (err) {
             console.error('Error logging bandwidth usage to database', err);
         }

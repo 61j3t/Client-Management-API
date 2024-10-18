@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllClients } = require('../services/clientService');
+const { getAllClients, createClient } = require('../services/clientService');
 const { isAuthenticated } = require('../middleware/authMiddleware');
 
 /**
@@ -55,6 +55,51 @@ router.get('/clients', isAuthenticated, async (req, res) => {
         res.json(clients);
     } catch (err) {
         res.status(500).send('Error fetching clients');
+    }
+});
+
+/**
+ * @swagger
+ * /clients:
+ *   post:
+ *     summary: Create a new client
+ *     tags: [Clients]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               client_name:
+ *                 type: string
+ *               max_bandwidth:
+ *                 type: number
+ *                 format: float
+ *               cir:
+ *                 type: number
+ *                 format: float
+ *               ip_address:
+ *                 type: string
+ *               mac_address:
+ *                 type: string
+ *               device_type:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Client created successfully
+ *       500:
+ *         description: Error creating client
+ */
+router.post('/clients', isAuthenticated, async (req, res) => {
+    const clientData = req.body;
+    try {
+        const newClient = await createClient(clientData);
+        res.status(201).json(newClient);
+    } catch (err) {
+        res.status(500).send('Error creating client');
     }
 });
 

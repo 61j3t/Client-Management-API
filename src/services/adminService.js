@@ -8,6 +8,7 @@ async function getAdminCredentials(username) {
         );
 
         if (result.rows.length > 0) {
+            console.log(result.rows);
             return result.rows[0];
         } else {
             throw new Error('Admin not found');

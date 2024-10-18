@@ -4,12 +4,13 @@ const bodyParser = require('body-parser');
 const adminRoutes = require('./routes/adminRoutes');
 const downloadRoutes = require('./routes/downloadRoutes');
 const clientRoutes = require('./routes/clientRoutes');
+const controlRoutes = require('./routes/controlRoutes'); // Import control routes
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const { simulateTraffic } = require('./services/trafficSimulationService'); // Import the traffic simulation service
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Swagger definition
 const swaggerOptions = {
@@ -33,11 +34,12 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Middleware to parse request bodies
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // Add this line to parse URL-encoded data
 
 // Session setup
 app.use(session({
-    secret: 'your-secret-key', // Replace with a strong secret key
+    secret: 'your-secret', // Replace with a strong secret key
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // Set to true if using HTTPS
@@ -47,6 +49,7 @@ app.use(session({
 app.use(adminRoutes);
 app.use(downloadRoutes);
 app.use(clientRoutes);
+app.use(controlRoutes); // Use control routes
 
 // Start traffic simulation
 simulateTraffic();

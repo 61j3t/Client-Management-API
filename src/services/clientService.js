@@ -37,4 +37,23 @@ async function getAllClients() {
     }
 }
 
-module.exports = { getClientMaxBandwidth, getAllClients };
+/**
+ * Creates a new client in the database.
+ * @param {Object} clientData - The data for the new client.
+ * @returns {Promise<Object>} - The created client object.
+ */
+async function createClient(clientData) {
+    const { client_name, max_bandwidth, cir, ip_address, mac_address, device_type } = clientData;
+    try {
+        const result = await db.query(
+            'INSERT INTO clients (client_name, max_bandwidth, cir, ip_address, mac_address, device_type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [client_name, max_bandwidth, cir, ip_address, mac_address, device_type]
+        );
+        return result.rows[0];
+    } catch (err) {
+        console.error('Error creating client:', err);
+        throw err;
+    }
+}
+
+module.exports = { getClientMaxBandwidth, getAllClients, createClient };

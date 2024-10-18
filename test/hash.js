@@ -6,12 +6,12 @@ async function generateHash(password) {
         const saltRounds = 10; // Number of salt rounds for hashing
         const hash = await bcrypt.hash(password, saltRounds);
         console.log(`Password: ${password}`);
-        console.log(`Hash: ${hash}`);
+        console.log(`${hash}`);
     } catch (error) {
         console.error('Error generating hash:', error);
     }
 }
 
 // Example usage
-const password = 'c1jet123'; // Replace with the password you want to hash
+const password = 'c1jet'; // Replace with the password you want to hash
 generateHash(password);
