@@ -76,7 +76,7 @@ The API documentation is available at `http://localhost:3000/api-docs`. It provi
 
 To start the application, run:
 ```bash
-npm start
+nodemon src/server.js
 ```
 The server will be running on `http://localhost:3000`.
 
