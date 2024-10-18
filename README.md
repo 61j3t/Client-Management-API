@@ -23,7 +23,7 @@ This project sets up an Express server that serves a file for download while log
    npm install
    ```
 3. **Set Up Environment Variables**:
-   Create a `.env` file in the root of your project and add the following variables:
+   Create a `src/.env` file in the root of your project and add the following variables:
 
    ```plaintext
    PORT=3000
