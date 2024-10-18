@@ -6,6 +6,14 @@ const Throttle = require('throttle');
 const fs = require('fs')
 const { Pool } = require('pg');
 require('dotenv').config();
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const cors = require('cors'); // Import CORS
+const adminRoutes = require('./routes/adminRoutes');
+const downloadRoutes = require('./routes/downloadRoutes');
+const clientRoutes = require('./routes/clientRoutes');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +29,45 @@ const pool = new Pool({
 
 // Middleware to parse JSON requests
 app.use(express.json());
+
+// Enable CORS for all routes
+app.use(cors({
+    origin: 'http://localhost:3000', // Allow only this origin
+    methods: ['GET', 'POST'], // Allow only specific methods
+    credentials: true // Allow credentials (like cookies)
+}));
+
+// Swagger definition
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Client Management API',
+            version: '1.0.0',
+            description: 'API documentation for managing clients and bandwidth',
+        },
+        servers: [
+            {
+                url: `http://localhost:${PORT}`,
+            },
+        ],
+    },
+    apis: ['./routes/*.js'], // Path to the API docs
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// Middleware to parse request bodies
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Session setup
+app.use(session({
+    secret: 'your-secret-key', // Replace with a strong secret key
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using HTTPS
+}));
 
 // Test database connection
 app.get('/test-db', async (req, res) => {
@@ -170,6 +217,11 @@ async function logBandwidthUsage(bandwidth) {
     // Print the bandwidth usage instead of logging to the database
     console.log("Bandwidth usage:", bandwidthInt);
 }
+
+// Use routes
+app.use(adminRoutes);
+app.use(downloadRoutes);
+app.use(clientRoutes);
 
 // Start the server
 app.listen(PORT, () => {
