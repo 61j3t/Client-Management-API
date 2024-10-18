@@ -3,7 +3,9 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const adminRoutes = require('./routes/adminRoutes');
 const downloadRoutes = require('./routes/downloadRoutes');
+const bandwidthRoutes = require('./routes/bandwidthRoutes');
 const clientRoutes = require('./routes/clientRoutes');
+const controlRoutes = require('./routes/controlRoutes');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const { simulateTraffic } = require('./services/trafficSimulationService');
@@ -33,7 +35,8 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Middleware to parse request bodies
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // Add this line to parse URL-encoded data
 
 // Session setup
 app.use(session({
@@ -47,6 +50,8 @@ app.use(session({
 app.use(adminRoutes);
 app.use(downloadRoutes);
 app.use(clientRoutes);
+app.use('/control', controlRoutes);
+app.use(bandwidthRoutes);
 
 // Start traffic simulation
 simulateTraffic();

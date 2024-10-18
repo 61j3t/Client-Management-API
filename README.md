@@ -63,7 +63,7 @@ To set up the database locally, follow these steps:
 2. **Run the Setup Script**: Execute the import script to create the necessary tables and insert initial data:
 
    ```bash
-   ./import_db.sh
+   pg_restore -h localhost -U postgres -d devfest -v src/db_backups/devfest.dump
    ```
 
 3. **Update your `.env` file** with the correct database credentials.
@@ -76,7 +76,8 @@ The API documentation is available at `http://localhost:3000/api-docs`. It provi
 
 To start the application, run:
 ```bash
-nodemon src/server.js
+cd src
+nodemon server.js
 ```
 The server will be running on `http://localhost:3000`.
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllClients } = require('../services/clientService');
+const { getAllClients, createClient, deleteClient } = require('../services/clientService');
 const { isAuthenticated } = require('../middleware/authMiddleware');
 
 /**
@@ -55,6 +55,88 @@ router.get('/clients', isAuthenticated, async (req, res) => {
         res.json(clients);
     } catch (err) {
         res.status(500).send('Error fetching clients');
+    }
+});
+
+/**
+ * @swagger
+ * /clients:
+ *   post:
+ *     summary: Create a new client
+ *     tags: [Clients]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               client_name:
+ *                 type: string
+ *               max_bandwidth:
+ *                 type: number
+ *                 format: float
+ *               cir:
+ *                 type: number
+ *                 format: float
+ *               ip_address:
+ *                 type: string
+ *               mac_address:
+ *                 type: string
+ *               device_type:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Client created successfully
+ *       500:
+ *         description: Error creating client
+ */
+router.post('/clients', isAuthenticated, async (req, res) => {
+    const clientData = req.body;
+    try {
+        const newClient = await createClient(clientData);
+        res.status(201).json(newClient);
+    } catch (err) {
+        res.status(500).send('Error creating client');
+    }
+});
+
+/**
+ * @swagger
+ * /clients/{client_id}:
+ *   delete:
+ *     summary: Delete a client
+ *     tags: [Clients]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: client_id
+ *         required: true
+ *         description: The ID of the client to delete
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: Client deleted successfully
+ *       404:
+ *         description: Client not found
+ *       500:
+ *         description: Error deleting client
+ */
+router.delete('/clients/:client_id', isAuthenticated, async (req, res) => {
+    const clientId = parseInt(req.params.client_id);
+    try {
+        await deleteClient(clientId);
+        res.status(204).send(); // No content to send back
+    } catch (err) {
+        if (err.message === 'Client not found') {
+            res.status(404).send('Client not found');
+        } else {
+            res.status(500).send(err);
+        }
     }
 });
 
