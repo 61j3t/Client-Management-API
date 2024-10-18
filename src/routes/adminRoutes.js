@@ -58,9 +58,7 @@ router.post('/login', async (req, res) => {
 
     try {
         const admin = await getAdminCredentials(username);
-        console.log('Fetched Admin:', admin);
         const isPasswordCorrect = await bcrypt.compare(password, admin.password_hash);
-        console.log('Password Match:', isPasswordCorrect);
 
         if (isPasswordCorrect) {
             req.session.isAuthenticated = true;
@@ -70,7 +68,7 @@ router.post('/login', async (req, res) => {
         }
     } catch (err) {
         console.error('Error during login:', err);
-        res.send('Invalid credentials');
+        res.send('Error during login');
     }
 });
 

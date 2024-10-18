@@ -56,4 +56,22 @@ async function createClient(clientData) {
     }
 }
 
-module.exports = { getClientMaxBandwidth, getAllClients, createClient };
+/**
+ * Deletes a client from the database.
+ * @param {number} clientId - The ID of the client to delete.
+ * @returns {Promise<void>}
+ */
+async function deleteClient(clientId) {
+    try {
+        // First, delete associated bandwidth stats
+        await db.query('DELETE FROM bandwidth_stats WHERE client_id = $1', [clientId]);
+        
+        // Then, delete the client
+        await db.query('DELETE FROM clients WHERE id = $1', [clientId]);
+    } catch (err) {
+        console.error('Error deleting client:', err);
+        throw err;
+    }
+}
+
+module.exports = { getClientMaxBandwidth, getAllClients, createClient, deleteClient };

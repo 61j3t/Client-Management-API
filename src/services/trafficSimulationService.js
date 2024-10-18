@@ -34,6 +34,8 @@ const simulateTraffic = async () => {
             totalBandwidthUsed += simulatedBandwidth;
         }
 
+        let totalActualBandwidthUsed = 0;
+
         // Second pass: Adjust bandwidth if total exceeds the limit
         for (const client of activeClients) {
             if (client.status === 'paused') {
@@ -51,10 +53,12 @@ const simulateTraffic = async () => {
                 allocatedBandwidth = Math.round(simulatedBandwidth * adjustmentFactor * 100) / 100; // Adjusted bandwidth
             }
 
+            totalActualBandwidthUsed += allocatedBandwidth;
+
             const timestamp = new Date().toISOString();
 
             // Log the bandwidth usage with allocated bandwidth
-            await logBandwidthUsage(client.id, simulatedBandwidth, allocatedBandwidth, timestamp);
+            await logBandwidthUsage(client.id, simulatedBandwidth, allocatedBandwidth, timestamp, totalActualBandwidthUsed);
         }
     }, simulationInterval);
 };

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllClients, createClient } = require('../services/clientService');
+const { getAllClients, createClient, deleteClient } = require('../services/clientService');
 const { isAuthenticated } = require('../middleware/authMiddleware');
 
 /**
@@ -100,6 +100,43 @@ router.post('/clients', isAuthenticated, async (req, res) => {
         res.status(201).json(newClient);
     } catch (err) {
         res.status(500).send('Error creating client');
+    }
+});
+
+/**
+ * @swagger
+ * /clients/{client_id}:
+ *   delete:
+ *     summary: Delete a client
+ *     tags: [Clients]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: client_id
+ *         required: true
+ *         description: The ID of the client to delete
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: Client deleted successfully
+ *       404:
+ *         description: Client not found
+ *       500:
+ *         description: Error deleting client
+ */
+router.delete('/clients/:client_id', isAuthenticated, async (req, res) => {
+    const clientId = parseInt(req.params.client_id);
+    try {
+        await deleteClient(clientId);
+        res.status(204).send(); // No content to send back
+    } catch (err) {
+        if (err.message === 'Client not found') {
+            res.status(404).send('Client not found');
+        } else {
+            res.status(500).send(err);
+        }
     }
 });
 
