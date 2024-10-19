@@ -11,7 +11,7 @@ const JWT_SECRET = '6f7c4a95e45f7a0e9bdb5d6b487cfe1f3c3bcd5f1f8d8eab173e8fbdccae
 // Specify your client origin here
 
 
-const CLIENT_ORIGIN = 'http://localhost:3001';
+const CLIENT_ORIGIN = 'http://localhost:3000';
 
 router.use(cors({
     origin: CLIENT_ORIGIN, // Allow your frontend origin

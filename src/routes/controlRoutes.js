@@ -36,7 +36,7 @@ const { isAuthenticated } = require('../middleware/authMiddleware');
  *       500:
  *         description: Error pausing client connection
  */
-router.post('/pause', isAuthenticated, async (req, res) => {
+router.post('/pause', async (req, res) => {
     const { client_id } = req.body;
     console.log(req.body)
     try {
@@ -73,7 +73,7 @@ router.post('/pause', isAuthenticated, async (req, res) => {
  *       500:
  *         description: Error resuming client connection
  */
-router.post('/resume', isAuthenticated, async (req, res) => {
+router.post('/resume', async (req, res) => {
     const { client_id } = req.body;
     try {
         await resumeClient(client_id);
@@ -109,7 +109,7 @@ router.post('/resume', isAuthenticated, async (req, res) => {
  *       500:
  *         description: Error banning client
  */
-router.post('/ban', isAuthenticated, async (req, res) => {
+router.post('/ban', async (req, res) => {
     const { client_id } = req.body;
     try {
         await banClient(client_id);
@@ -148,7 +148,7 @@ router.post('/ban', isAuthenticated, async (req, res) => {
  *       500:
  *         description: Error adjusting client bandwidth limit
  */
-router.post('/adjust-bandwidth', isAuthenticated, async (req, res) => {
+router.post('/adjust-bandwidth', async (req, res) => {
     const { client_id, new_limit } = req.body;
     try {
         await adjustBandwidthLimit(client_id, new_limit);

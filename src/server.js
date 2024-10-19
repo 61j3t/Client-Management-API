@@ -17,7 +17,7 @@ const app = express();
 const PORT = 3002;
 
 
-const CLIENT_ORIGIN = 'http://localhost:3001';
+const CLIENT_ORIGIN = 'http://localhost:3000';
 
 app.use(cors({
     origin: CLIENT_ORIGIN, // Allow your frontend origin
