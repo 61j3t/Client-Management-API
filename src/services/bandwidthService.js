@@ -13,18 +13,11 @@ const logBandwidthUsage = async (client_id, kbps, allocatedKbps, timestamp, tota
     }
 };
 
-const getBandwidthRecords = async (clientId, startDate, endDate, status, limit, offset) => {
+
+const getAllBandwidthRecords = async () => {
     try {
-        const query = `
-            SELECT * FROM bandwidth_stats
-            WHERE ($1::int IS NULL OR client_id = $1)
-            AND ($2::timestamp IS NULL OR timestamp >= $2)
-            AND ($3::timestamp IS NULL OR timestamp <= $3)
-            AND ($4::varchar IS NULL OR status = $4)
-            ORDER BY timestamp DESC
-            LIMIT $5 OFFSET $6
-        `;
-        const result = await pool.query(query, [clientId, startDate, endDate, status, limit, offset]);
+        const query = 'SELECT * FROM bandwidth_stats ORDER BY timestamp DESC';
+        const result = await pool.query(query);
         return result.rows;
     } catch (err) {
         console.error('Error fetching bandwidth records:', err);
@@ -32,4 +25,7 @@ const getBandwidthRecords = async (clientId, startDate, endDate, status, limit, 
     }
 };
 
-module.exports = { logBandwidthUsage, getBandwidthRecords };
+module.exports = { getAllBandwidthRecords };
+
+
+module.exports = { logBandwidthUsage, getAllBandwidthRecords };

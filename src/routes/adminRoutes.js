@@ -1,59 +1,25 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const router = express.Router();
+const jwt = require('jsonwebtoken');
 const { getAdminCredentials } = require('../services/adminService');
-const { isAuthenticated } = require('../middleware/authMiddleware');
+const router = express.Router();
+const cors = require('cors');
 
-/**
- * @swagger
- * tags:
- *   name: Admin
- *   description: Admin management operations
- */
+// Your secret key for signing tokens
+const JWT_SECRET = '6f7c4a95e45f7a0e9bdb5d6b487cfe1f3c3bcd5f1f8d8eab173e8fbdccae1f85';
 
-/**
- * @swagger
- * /login:
- *   get:
- *     summary: Display the login form
- *     tags: [Admin]
- *     responses:
- *       200:
- *         description: Login form
- *   post:
- *     summary: Authenticate admin
- *     tags: [Admin]
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 example: "c1jet"
- *               password:
- *                 type: string
- *                 example: "password123"
- *     responses:
- *       302:
- *         description: Redirects to admin dashboard on success
- *       401:
- *         description: Invalid credentials
- */
-router.get('/login', (req, res) => {
-    res.send(`
-        <form method="POST" action="/login">
-            <input type="text" name="username" placeholder="Username" required />
-            <input type="password" name="password" placeholder="Password" required />
-            <button type="submit">Login</button>
-        </form>
-    `);
-});
+// Specify your client origin here
 
+
+const CLIENT_ORIGIN = 'http://localhost:3001';
+
+router.use(cors({
+    origin: CLIENT_ORIGIN, // Allow your frontend origin
+    credentials: true // Allow credentials
+}));
+
+// Handle login form submission (POST /login)
 router.post('/login', async (req, res) => {
-    console.log('Request Body:', req.body);
     const { username, password } = req.body;
 
     try {
@@ -61,34 +27,40 @@ router.post('/login', async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(password, admin.password_hash);
 
         if (isPasswordCorrect) {
-            req.session.isAuthenticated = true;
+            // Generate a JWT token
+            const token = jwt.sign({ username: admin.username }, JWT_SECRET, { expiresIn: '1h' });
 
-            return res.redirect('/admin');
+            // Return the token in the response
+            return res.json({ token }); // Send token as JSON response
         } else {
-            res.send('Invalid credentials');
+            res.status(401).send('Invalid credentials');
         }
     } catch (err) {
         console.error('Error during login:', err);
-        res.send(err);
+        res.status(500).send('Error during login');
     }
 });
 
-/**
- * @swagger
- * /admin:
- *   get:
- *     summary: Admin dashboard (protected)
- *     tags: [Admin]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Welcome message for admin
- *       401:
- *         description: Unauthorized access
- */
+// Middleware to verify JWT token
+const isAuthenticated = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from Bearer scheme
+
+    if (!token) {
+        return res.status(401).send('Access denied. No token provided.');
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded; // Save decoded token data in req.user
+        next();
+    } catch (err) {
+        return res.status(400).send('Invalid token.');
+    }
+};
+
+// Admin dashboard route (GET /admin), protected by the `isAuthenticated` middleware
 router.get('/admin', isAuthenticated, (req, res) => {
-    res.send('Welcome, Admin!');
+    res.send(`Welcome, ${req.user.username}!`); // Use username from decoded token
 });
 
 module.exports = router;

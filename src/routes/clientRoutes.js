@@ -49,7 +49,7 @@ const { isAuthenticated } = require('../middleware/authMiddleware');
  *       500:
  *         description: Error fetching clients
  */
-router.get('/clients', isAuthenticated, async (req, res) => {
+router.get('/clients', async (req, res) => {
     try {
         const clients = await getAllClients();
         res.json(clients);
@@ -93,7 +93,7 @@ router.get('/clients', isAuthenticated, async (req, res) => {
  *       500:
  *         description: Error creating client
  */
-router.post('/clients', isAuthenticated, async (req, res) => {
+router.post('/clients', async (req, res) => {
     const clientData = req.body;
     try {
         const newClient = await createClient(clientData);
@@ -126,7 +126,7 @@ router.post('/clients', isAuthenticated, async (req, res) => {
  *       500:
  *         description: Error deleting client
  */
-router.delete('/clients/:client_id', isAuthenticated, async (req, res) => {
+router.delete('/clients/:client_id', async (req, res) => {
     const clientId = parseInt(req.params.client_id);
     try {
         await deleteClient(clientId);

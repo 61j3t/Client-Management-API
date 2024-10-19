@@ -11,14 +11,18 @@ const swaggerUi = require('swagger-ui-express');
 const { simulateTraffic } = require('./services/trafficSimulationService');
 const cors = require('cors');
 
-const app = express();
-const PORT = 3001;
 
-// CORS setup
+const app = express();
+const PORT = 3002;
+
+
+const CLIENT_ORIGIN = 'http://localhost:3001';
+
 app.use(cors({
-    origin: 'http://localhost:3000', // Update with your frontend's URL
+    origin: CLIENT_ORIGIN, // Allow your frontend origin
     credentials: true // Allow cookies to be sent with CORS requests
 }));
+
 
 // Swagger definition
 const swaggerOptions = {
@@ -50,8 +54,19 @@ app.use(session({
     secret: 'Xh8zA1q2k6T5sL9uJf3vPz8yRg7Dq4hR', 
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === 'production' } // Use environment variable for secure cookie
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production', // Ensure cookies are sent over HTTPS in production
+        maxAge: 3600000 // Set session expiration time (1 hour in this case)
+    }
 }));
+
+// Middleware to ensure authentication on protected routes
+function isAuthenticated(req, res, next) {
+    if (req.session.isAuthenticated) {
+        return next();
+    }
+    res.redirect('/login'); // Redirect to login if not authenticated
+}
 
 // Use routes
 app.use(adminRoutes);
