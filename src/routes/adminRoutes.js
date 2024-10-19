@@ -53,7 +53,7 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    console.log('Request Body:', req.body); // Log the entire request body
+    console.log('Request Body:', req.body);
     const { username, password } = req.body;
 
     try {
@@ -62,13 +62,14 @@ router.post('/login', async (req, res) => {
 
         if (isPasswordCorrect) {
             req.session.isAuthenticated = true;
+
             return res.redirect('/admin');
         } else {
             res.send('Invalid credentials');
         }
     } catch (err) {
         console.error('Error during login:', err);
-        res.send('Error during login');
+        res.send(err);
     }
 });
 

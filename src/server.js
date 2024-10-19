@@ -9,9 +9,16 @@ const controlRoutes = require('./routes/controlRoutes');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const { simulateTraffic } = require('./services/trafficSimulationService');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3001;
+
+// CORS setup
+app.use(cors({
+    origin: 'http://localhost:3000', // Update with your frontend's URL
+    credentials: true // Allow cookies to be sent with CORS requests
+}));
 
 // Swagger definition
 const swaggerOptions = {
@@ -36,14 +43,14 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Middleware to parse request bodies
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // Add this line to parse URL-encoded data
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Session setup
 app.use(session({
     secret: 'Xh8zA1q2k6T5sL9uJf3vPz8yRg7Dq4hR', 
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true } // Set to true if using HTTPS
+    cookie: { secure: process.env.NODE_ENV === 'production' } // Use environment variable for secure cookie
 }));
 
 // Use routes
