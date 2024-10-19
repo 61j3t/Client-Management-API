@@ -12,6 +12,7 @@ const { simulateTraffic } = require('./services/trafficSimulationService');
 const cors = require('cors');
 
 
+
 const app = express();
 const PORT = 3002;
 
@@ -55,8 +56,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: { 
-        secure: process.env.NODE_ENV === 'production', // Ensure cookies are sent over HTTPS in production
-        maxAge: 3600000 // Set session expiration time (1 hour in this case)
+        secure: process.env.NODE_ENV === 'production', 
+        maxAge: 3600000 
     }
 }));
 

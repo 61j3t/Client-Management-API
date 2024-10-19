@@ -2,6 +2,7 @@ const { logBandwidthUsage } = require('./bandwidthService');
 const { getAllClients } = require('./clientService');
 
 const TOTAL_BANDWIDTH_LIMIT = 4000; // Define the total bandwidth limit in kbps
+const RANDOM_BANDWIDTH_MAX = 500; // Define a maximum random bandwidth in kbps
 
 const simulateTraffic = async () => {
     const clients = await getAllClients();
@@ -26,11 +27,10 @@ const simulateTraffic = async () => {
             if (client.status === 'paused') {
                 continue; // Skip this client if they are paused
             }
-            const minBandwidth = client.cir; // Use CIR as the minimum
-            const maxBandwidth = client.max_bandwidth; // Use max bandwidth as the maximum
-            
-            // Simulate bandwidth usage
-            const simulatedBandwidth = Math.round(Math.random() * (maxBandwidth * 2 - minBandwidth) + minBandwidth * 100) / 100; // Random bandwidth usage
+
+            // Generate a random bandwidth value between 0 and RANDOM_BANDWIDTH_MAX
+            const simulatedBandwidth = Math.round(Math.random() * RANDOM_BANDWIDTH_MAX * 100) / 100;
+
             totalBandwidthUsed += simulatedBandwidth;
         }
 
@@ -41,11 +41,9 @@ const simulateTraffic = async () => {
             if (client.status === 'paused') {
                 continue; // Skip this client if they are paused
             }
-            const minBandwidth = client.cir; // Use CIR as the minimum
-            const maxBandwidth = client.max_bandwidth; // Use max bandwidth as the maximum
-            
-            // Simulate bandwidth usage
-            const simulatedBandwidth = Math.round(Math.random() * (maxBandwidth * 2 - minBandwidth) + minBandwidth * 100) / 100; // Random bandwidth usage
+
+            // Generate a random bandwidth value between 0 and RANDOM_BANDWIDTH_MAX
+            const simulatedBandwidth = Math.round(Math.random() * RANDOM_BANDWIDTH_MAX * 100) / 100; // Random bandwidth usage
             let allocatedBandwidth = simulatedBandwidth;
 
             if (totalBandwidthUsed > TOTAL_BANDWIDTH_LIMIT) {
