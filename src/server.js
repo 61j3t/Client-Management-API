@@ -30,7 +30,7 @@ const swaggerOptions = {
     swaggerDefinition: {
         openapi: '3.0.0',
         info: {
-            title: 'Client Management API',
+            title: 'Enhanced Quality of Experience (QoE) for Satellite Broadband Users',
             version: '1.0.0',
             description: 'API documentation for managing clients and bandwidth',
         },
@@ -52,12 +52,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Session setup
 app.use(session({
-    secret: 'Xh8zA1q2k6T5sL9uJf3vPz8yRg7Dq4hR', 
+    secret: 'Xh8zA1q2k6T5sL9uJf3vPz8yRg7Dq4hR',
     resave: false,
     saveUninitialized: true,
-    cookie: { 
-        secure: process.env.NODE_ENV === 'production', 
-        maxAge: 3600000 
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 3600000
     }
 }));
 
